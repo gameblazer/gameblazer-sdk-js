@@ -1,0 +1,16 @@
+Gameblazer.net Javascript SDK 
+============================================================================
+
+An sdk for WebGL game authors, integrating social
+like components in their games. Currently provides:
+
+- uniform login
+- ad management
+- oauth 2.0 authentication
+
+coming soon:
+
+- awards *
+- more ad system *
+
+http://gameblazer.net/sdk
