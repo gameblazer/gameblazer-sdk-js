@@ -7,10 +7,14 @@ like components in their games. Currently provides:
 - uniform login
 - ad management
 - oauth 2.0 authentication
+- game credits [in the works]
 
-coming soon:
+-- things you need to know
+The Gameblazer JS SDK uses window.postMessage, a relatively new standard, as a result
+needs atleast the following versions in browsers
 
-- awards *
-- more ad system *
+Feature Chrome  |   Firefox (Gecko) | Internet Explorer |  Opera    |   Safari (WebKit)
+Basic support 1.0     6.0 (6.0)          8.0                 9.5          4.0
 
+More info:
 http://gameblazer.net/sdk

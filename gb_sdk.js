@@ -40,16 +40,18 @@
   Gameblazer.VERSION = '0.0.1';
   Gameblazer.base = {};
   Gameblazer.setup = {};
-  Gameblazer.abshome = 'https://gameblazer.net/api/';
+  Gameblazer.apihome = 'https://gameblazer.net/api/';
   Gameblazer.home = window.APPLICATION_BASE || 'https://gameblazer.net/',
   Gameblazer.player = {}; // main player is always at root of this. 
   Gameblazer.received = 0; // cross window communication signal.
+  Gameblazer.endpoints = ['credits', 'login', 'logout']; // list of valid endpoints
+  Gameblazer.authToken = ""; // our OAUTH token
 
   // open the oauth grant for the current client
   // @param q -> area to open
   Gameblazer.open = function(q) { 
   	q = q || '';
-  	return window.open(Gameblazer.abshome + q, 'Gameblazer OAuth Grant', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0');
+  	return window.open(Gameblazer.apihome + q, 'Gameblazer OAuth Grant', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0');
   };
 
   // message passing between two or more endpoints(domains)
@@ -127,7 +129,7 @@
   	// 2 -> the user isn't logged in and the game requests
   	// 3 -> request isn't granted.
   	var I = window.setInterval(function() {
-  	  win.postMessage('waiting on response', Gameblazer.abshome);
+  	  win.postMessage('waiting on response', Gameblazer.apihome);
 
 
       // by now the client has either logged into the game or canceled
@@ -137,15 +139,110 @@
       // callback's response is stored in Gameblazer.player
       if (Gameblazer.received && Gameblazer.player) {
         window.clearInterval(I);
+        //
+        // set the oauth token
+        Gameblazer.authToken = Gameblazer.player.authToken;
+
         callback(Gameblazer.player);
       }
   	}, 1000);
   };
 
+  Gameblazer.getAuthToken = function() {
+    return Gameblazer.authToken;
+  };
+
+  Gameblazer.setAuthToken = function(token) {
+    Gameblazer.authToken =  token;
+  };
+  // check agaisnt what was asked in our login
+  // scope
+  // return a list of things that were accepted
+  // @param params -> list of params to check
+  Gameblazer.hasAuthFor = function(params) {
+    var acceptedList = [];
+    assert(Gameblazer.setup.processed);
+    assert(Gameblazer.setup.legal);
+    for (var i in Gameblazer.authAccepted) {
+      for (var j in params) {
+        if (Gameblazer.authAccepted[i] === params[j]) {
+          acceptedList.push(params[j]);
+        }
+      }
+    }
+    return acceptedList;
+  };
+  // credit based callback
+  //  needs the following:
+  // name, description and amount
+  // optinally specify the id of the credit
+  // as made in the gb developer interface
+  //
+  // @param opts -> list of options for this credit
+  // @param callback -> callback onsuccess or error
+  Gameblazer.credit = function(opts, callback) {
+    assert(Gameblazer.setup.processed);
+    assert(Gameblazer.setup.legal);
+    if (Gameblazer.hasAuthFor(['credit', 'login'])) {
+
+      // start a request to the credit
+      // endpoint with this credit information
+      //
+      Gameblazer.request("credits", opts, function(data_received) {
+        callback(data_received);
+      });
+    } 
+  };
+
+  // requests on the private API
+  //
+  // method -> GET | POST only
+  // endpoint -> valid endpoint in Gameblazer see gb.endpoints
+  // data -> Javascript object
+  // callback -> function
+  Gameblazer.request = function(method, endpoint, data, callback) {
+    var xhr = new XMLHttpRequest, parameterString; 
+
+    xhr.onreadystatechange = function() {
+      if (this.readyState === "4") {
+        Gameblazer.callbackInternal(this.responseText, callback, true);
+      } 
+    };
+    if (method === "POST") {
+      for (var i in data) {
+        parameterString +=  i + "=" + data[i];
+      }   
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.setRequestHeader("Authorization", "Bearer " + Gameblazer.authToken);
+      xhr.open(method, Gameblazer.apihome + endpoint + "/", parameterString, false /** async **/);
+      xhr.send(parameterString);
+    } else { // get
+      parameterString = "?";
+      for (var i in data) {
+        parameterString += i + "=" + data[i];
+      }
+      xhr.open(method, Gameblazer.apihome + endpoint + "/" + parameterString, false /** async **/);
+
+      xhr.setRequestHeader("Authorization", "Bearer " + Gameblazer.authToken);
+      xhr.send();
+    }
+
+  };
+
+  // data should be unserialized
+  //
+  Gameblazer.callbackInternal = function(data, callback, success) {
+      var dataSerialized = JSON.parse(data);
+      return callback(dataSerialized);
+  }
+
   // Simply request a logout for the user.
   // @param callback -> function [response -> user defined response]
   Gameblazer.logout = function(callback) {
     assert(Gameblazer.player);
+    Gameblazer.request("logout", function(data) {
+      callback(data);
+    });
   };
 
   // Stub to the AdConn. This basically allows

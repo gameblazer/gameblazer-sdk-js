@@ -1,0 +1,19 @@
+<!DOCCTYPE HTML>
+
+<html>
+
+<script type="text/javascript" src="./gb_sdk.js"></script>
+<script>
+gb.init({
+  "pubKey": "testing",
+  "gameId": "test",
+  "cookies": true
+});
+gb.login(function(resp) {
+  if (resp.status === "ok") {
+  }
+}, { scope: "user, credits" });
+
+</script>
+</html>
+
