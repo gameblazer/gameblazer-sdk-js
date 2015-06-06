@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<head>
+<title>Gamblazer.net JS SDK testing users</title>
+</head>
+<body>
+<h2>Sample using user login with Gameblazer javascript SDK</h2>
+<script type='application/javascript' src='../gb_sdk.js'></script>
+<script>
+gb.init({
+  'pubKey': 'ae502c31-cb3d-4765-9573-30b4add5c28c',
+  'gameId': '31ba9aa8-c62b-4506-ae85-e33b4fbcd29a'
+});
+gb.login(function(data) {
+  if (res.status) {
+    console.log('hello: ' + data.username); 
+  }
+}, {"scope": "user, login"});
+</script>
+</body>
+</html>

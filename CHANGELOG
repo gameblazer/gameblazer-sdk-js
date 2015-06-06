@@ -1,0 +1,11 @@
+0.1.0
+----------------------------------------
+
+Basics, base of js sdk, provides:
+
+- OAuth 2.0 with Gameblazer.net
+- login, logout for game users
+
+0.2.0
+----------------------------------------
+- add game credits to sdk

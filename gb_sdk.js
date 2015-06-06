@@ -41,7 +41,7 @@
   Gameblazer.base = {};
   Gameblazer.setup = {};
   Gameblazer.apihome = 'https://gameblazer.net/api/';
-  Gameblazer.home = window.APPLICATION_BASE || 'https://gameblazer.net/',
+  Gameblazer.home = window.APPLICATION_BASE || 'https://gameblazer.net/api/';
   Gameblazer.player = {}; // main player is always at root of this. 
   Gameblazer.received = 0; // cross window communication signal.
   Gameblazer.endpoints = ['credits', 'login', 'logout']; // list of valid endpoints
@@ -119,7 +119,7 @@
   Gameblazer.login = function(callback, scope) {
   	assert(Gameblazer.setup.processed);
   	assert(Gameblazer.setup.legal);
-  	var win = Gameblazer.open('?pubkey=' + Gameblazer.setup.pubKey + '&scope=' + scope.scope);
+  	var win = Gameblazer.open('?pubkey=' + Gameblazer.setup.pubKey + '&gameId=' + Gameblazer.setup.gameId + '&scope=' + scope.scope);
 
   	// here we wait for the cookie or localstorage object
   	// to be set
@@ -142,7 +142,7 @@
         //
         // set the oauth token
         Gameblazer.authToken = Gameblazer.player.authToken;
-
+        Gameblazer.game  = Gameblazer.player.game;
         callback(Gameblazer.player);
       }
   	}, 1000);
@@ -160,6 +160,10 @@
   // return a list of things that were accepted
   // @param params -> list of params to check
   Gameblazer.hasAuthFor = function(params) {
+    // no auth at all
+    if (!Gameblazer.authToken) {
+      return false; 
+    }
     var acceptedList = [];
     assert(Gameblazer.setup.processed);
     assert(Gameblazer.setup.legal);
@@ -188,6 +192,8 @@
       // start a request to the credit
       // endpoint with this credit information
       //
+      opts['user_id'] = Gameblazer.player.uid;
+      opts['game_id'] = Gameblazer.setup.gameId;
       Gameblazer.request("credits", opts, function(data_received) {
         callback(data_received);
       });
@@ -210,7 +216,7 @@
     };
     if (method === "POST") {
       for (var i in data) {
-        parameterString +=  i + "=" + data[i];
+        parameterString +=  i + "=" + data[i] + '&';
       }   
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhr.setRequestHeader("Authorization", "Bearer " + Gameblazer.authToken);
@@ -221,7 +227,7 @@
       for (var i in data) {
         parameterString += i + "=" + data[i];
       }
-      xhr.open(method, Gameblazer.apihome + endpoint + "/" + parameterString, false /** async **/);
+      xhr.open(method, Gameblazer.apihome + "/_request/" + "?endpoint=" +  endpoint + "/" + parameterString, false /** async **/);
 
       xhr.setRequestHeader("Authorization", "Bearer " + Gameblazer.authToken);
       xhr.send();

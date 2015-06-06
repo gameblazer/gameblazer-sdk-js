@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Gameblazer.net SDK testing User login</title>
+</head>
+<body>
+<h2>Sample using credits with gameblazer SDK</h2>
+<script type="application/javascript" src="../gb-sdk.js"></script>
+<script>
+gb.init({
+  "pubKey": "P-XXX",
+  "gameId": "G-XXX"
+});
+gb.login(function(userData) {
+  if (res) {
+    console.log("Hello: " + userData.username);
+    // add a credit!
+    gb.credits({
+      'creditId': 'C-XXX'
+    }, function(data) {
+      console.log("We've awarded you with game credit: "  + data.credit.name);
+      console.log("This is always available via your profile, thanks for playing: " + gb.game.name);
+  }
+}, {'scope': "profile"});
+</script>
