@@ -10,21 +10,13 @@ gb.login(function(data) {
       // hello
       console.log(data.data);
       // let's try and use the api for highscores
-      var Highscore = new gb.highscores();
-      Highscore.add({
-          "score": 100,
-          "description": "fantastic, you earned a highscore!"
-        }, function(data) {
+      gb.highscores({ "action": "add",
+                  "score":100,
+                  "description": "fantastic, you earned a highscore"
+       }, function(callback) {
+            // data for highscore  
+      });
 
-          if (data.status) {
-              // nice it was saved
-              alert("We saved your highscore of " + highscore);
-          } else {
-
-              alert("Could not save the highscore. Please try again later..");
-          }
-
-        }); 
     } else {
         // please login
     }
