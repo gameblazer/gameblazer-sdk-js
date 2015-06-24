@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<script type='application/javascript' src='../gb_sdk.js'></script>
+<script>
+gb.init({
+  "pubKey": "PUB-KEY",
+  "gameId": "gameId"
+});
+gb.login(function(data) {
+  if (data.status) {
+      // hello
+      console.log(data.data);
+      // let's try and use the api for highscores
+      var Highscore = new gb.highscores();
+      Highscore.add({
+          "score": 100,
+          "description": "fantastic, you earned a highscore!"
+        }, function(data) {
+
+          if (data.status) {
+              // nice it was saved
+              alert("We saved your highscore of " + highscore);
+          } else {
+
+              alert("Could not save the highscore. Please try again later..");
+          }
+
+        }); 
+    } else {
+        // please login
+    }
+    
+}, {"scope": "highscores, profile, login"});
+</script>
+

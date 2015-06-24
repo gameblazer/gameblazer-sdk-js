@@ -200,6 +200,50 @@
     } 
   };
 
+  // basic highscore manipulation 
+  // add a highscore or fetch a list of high
+  // scores
+  //
+
+  Gameblazer.highscores = function() {
+    assert(Gameblazer.setup.processed);
+    assert(Gameblazer.setup.legal);
+    return {
+      add: function(data, callback) {
+        // use the current game in creating
+        // a new highscore
+        if (Gameblazer.hasAuthFor(['highscores'])) {
+            opts['user_id'] = Gameblazer.player.uid; 
+            opts['game_id'] = Gameblazer.setup.gameId;
+            opts['score'] = data.score;
+            opts['description'] = data.description;
+            opts['action'] = "add";
+            Gameblazer.request("highscores", opts, function(data) {
+                return callback(data); 
+            });
+        }
+      },
+      list: function(page, offset, sortby, callback) {
+        // list needs an offset 
+        // it can be 0 .. 1000
+        //
+        opts = {};
+        opts['game_id'] = Gameblazer.setup.gameId;
+        opts['sort_by'] = sortby || "score";
+        opts['action'] = "list";
+        opts['page'] = page;
+        opts['offset'] = offset;
+        sortby = sortby || "score";
+
+         Gameblazer.request("highscores", opts, function(data) {
+              return callback(data);
+          });
+       }
+          
+      };
+  };
+  
+
   // requests on the private API
   //
   // method -> GET | POST only
