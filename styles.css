@@ -1,0 +1,25 @@
+/**
+ * packed gameblazer CSS sheet
+ * should include:
+ * credit styling
+ *
+ */
+
+.gb-credit {
+  padding: 5px;
+  text-align: center;
+  /** changable styles **/
+  background: #3D3D3D;
+  /** opaque by default**/
+  opacity: .7;
+}
+
+.gb-credit .gb-credit-title {
+  font-weight: 700;
+  font-size: 15px; 
+}
+
+.gb-credit .gb-credit-desc {
+  font-style: italic;
+  font-size: 13px;
+}

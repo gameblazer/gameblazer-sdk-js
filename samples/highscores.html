@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<script type='application/javascript' src='../gb_sdk.js'></script>
+<script type='application/javascript' src='../gb_sdk_load.js'></script>
 <script>
 gb.init({
   "pubKey": "PUB-KEY",
@@ -13,8 +13,13 @@ gb.login(function(data) {
       gb.highscores({ "action": "add",
                   "score":100,
                   "description": "fantastic, you earned a highscore"
-       }, function(callback) {
+       }, function(data) {
             // data for highscore  
+            if (data.status) { // good
+                alert("You saved your score");
+            } else { // could not be saved
+                alert("Score Was not saved");
+            }
       });
 
     } else {

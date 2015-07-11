@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+<div id="gameCont"></div>
+<script type="text/javascript" src="../gb_sdk_load.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.js"></script>
+<!-- jQuery -->
+<script type="text/javascript">
+window.onload = function() {
+  $ = window.$;
+  gb.init({
+      "pubKey": "PUBKEY",
+      "gameId": "GAMEID",
+      "gameContainer": $("#gameCont"),
+      "gbGraphics": true
+  });
+  gb.login(function(data) {
+    gb.credit({
+          "creditId": "C-XXX"
+      }, function(data) {
+          if (data.status) {
+              alert("Status was received");
+          } else {
+              // could not award the credit
+          }
+      })
+    }, {"scope": "credits,profile,login"});
+};
+</script> 
+</body>
+</html>

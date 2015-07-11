@@ -1,10 +1,7 @@
 /* Gameblazer Javascript SDK 1.0.
- * Copyright (c) 2013 Gameblazer. All rights reserved.
- * This library can be copied/used under an MIT license   */
+ * Copyright (c) 2013 Gameblazer. All rights reserved.  * This library can be copied/used under an MIT license   */
  
 /* This library holds information that can be distributed; copied free of charge.
- * Use this source code with respect. If you suspect or experience any bugs, 
- * do the right thing and contact us.        	   
  * Authors: Nadir Hamid et the Gameblazer team.
  */
 
@@ -46,7 +43,9 @@
   Gameblazer.received = 0; // cross window communication signal.
   Gameblazer.endpoints = ['credits', 'login', 'logout']; // list of valid endpoints
   Gameblazer.authToken = ""; // our OAUTH token
-
+  Gameblazer.icon = "";
+  Gameblazer.useGBGraphics = true;
+  
   // open the oauth grant for the current client
   // @param q -> area to open
   Gameblazer.open = function(q) { 
@@ -101,6 +100,18 @@
   	Gameblazer.setup.pubKey = client['pubKey'] || ''; // mandatory
   	Gameblazer.setup.gameId = client['gameId'] || ''; // which game is the sdk running on
   	Gameblazer.setup.cookies = client['cookies'] || true; // true or false. Not mandated.
+    Gameblazer.setup.gbGraphics = client['gbGraphics'] || false;
+    if (typeof client['gameContainer'] !== 'undefined') {
+        if (typeof window['$'] !== 'undefined') {
+            if (typeof client.gameContainer.get === 'undefined') {
+                  Gameblazer.setup.gameContainer = client.gameContainer;
+            } else { // try jquery
+                  Gameblazer.setup.gameContainer = client.gameContainer.get()[0];
+            }
+        } else {
+            Gameblazer.setup.gameContainer = client.gameContainer;
+        }
+    }
 
   	return {
   		setup: function() {
@@ -195,7 +206,9 @@
       opts['user_id'] = Gameblazer.player.uid;
       opts['game_id'] = Gameblazer.setup.gameId;
       Gameblazer.request("credits", opts, function(data_received) {
+        Gameblazer.afterwards(data_received);
         callback(data_received);
+        
       });
     } 
   };
@@ -282,6 +295,16 @@
       return callback(dataSerialized);
   }
 
+  Gameblazer.getGameContainer = function() {
+      if (Gameblazer.setup.gameContainer) {
+      // saetup with jQuery friendly
+      return typeof $ !== 'undefined' ? $(Gameblazer.setup.gameContainer) : Gameblazer.setup.gameContainer;
+      }
+      // warn by default 
+      //Throw("You need to set the Gameblazer.setup.mainContainer to use this");
+  };
+
+
   // Simply request a logout for the user.
   // @param callback -> function [response -> user defined response]
   Gameblazer.logout = function(callback) {
@@ -290,7 +313,25 @@
       callback(data);
     });
   };
+  
+  // right after the api has been hit
+  // either use the gbgraphics or not
+  // 
+  // can only be called on success
+  Gameblazer.afterwards = function(data) {
+    if (data.status) {
+      if (Gameblazer.setup.gbGraphics) {
+            // what is it?
+            if (data.type_of_object === "credits") {
+                GBGraphics.renderCredit(data);
+            }
+        }
+      }
+    };
 
+  Gameblazer.set = function(key, val) {
+      Gameblazer.setup[key] = val;
+  };
   // Stub to the AdConn. This basically allows
   // the implementor to design an ad and have it served
   // @param options -> ad based options 
